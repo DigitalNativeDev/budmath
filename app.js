@@ -11,6 +11,12 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('darkMode', 
             document.documentElement.classList.contains('dark') ? 'enabled' : 'disabled'
         );
+        
+        // Track theme changes
+        window.dataLayer.push({
+            'event': 'theme_change',
+            'theme_mode': document.documentElement.classList.contains('dark') ? 'light' : 'dark'
+        });
     });
 
     // Calculate functionality
@@ -25,12 +31,25 @@ function calculateGrams() {
     const amountRemaining = parseFloat(document.getElementById('amountRemaining').value);
 
     if (isNaN(amountRemaining) || amountRemaining < 0) {
+        // Track invalid input attempts
+        window.dataLayer.push({
+            'event': 'calculation_error',
+            'error_type': 'invalid_input'
+        });
         alert('Please enter a valid amount');
         return;
     }
 
     const gramsPerOunce = 28;
     const remainingGrams = (amountRemaining * gramsPerOunce).toFixed(2);
+
+    // Track successful calculations
+    window.dataLayer.push({
+        'event': 'calculation_success',
+        'calculation_type': 'ounce_to_gram',
+        'input_amount': amountRemaining,
+        'result_amount': remainingGrams
+    });
 
     // Display result
     const resultDiv = document.getElementById('result');
@@ -274,6 +293,12 @@ function loadHistory() {
         
         // Add click handler
         item.addEventListener('click', () => {
+            // Track history item clicks
+            window.dataLayer.push({
+                'event': 'history_calculation_click',
+                'calculation_value': calc.ounces
+            });
+            
             // Set the input value
             document.getElementById('amountRemaining').value = calc.ounces;
             // Scroll to top smoothly
