@@ -1,29 +1,30 @@
-// GTM Event Definitions
+// Ensure dataLayer is initialized before pushing events
 window.dataLayer = window.dataLayer || [];
 
-// Page View tracking
-window.dataLayer.push({
-    'event': 'page_view',
-    'page_title': document.title,
-    'page_location': window.location.href,
-    'page_path': window.location.pathname
-});
+// Function to safely push events to dataLayer
+function pushGTMEvent(eventName, eventData = {}) {
+    dataLayer.push({
+        'event': eventName,
+        ...eventData
+    });
+}
 
-// Define custom events
-const GTM_EVENTS = {
-    CALCULATION: {
-        SUCCESS: 'calculation_success',
-        ERROR: 'calculation_error'
-    },
-    THEME: {
-        CHANGE: 'theme_change'
-    },
-    HISTORY: {
-        CLICK: 'history_calculation_click'
-    }
-};
+// Add event listener after DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    // Track calculator usage
+    document.getElementById('calculateBtn').addEventListener('click', () => {
+        const amount = document.getElementById('amountRemaining').value;
+        pushGTMEvent('calculator_used', {
+            'input_amount': amount,
+            'calculator_type': 'cannabis_conversion'
+        });
+    });
 
-// Export for use in other files
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = GTM_EVENTS;
-} 
+    // Track dark mode toggle
+    document.getElementById('darkModeToggle').addEventListener('click', () => {
+        const isDarkMode = document.documentElement.classList.contains('dark');
+        pushGTMEvent('theme_changed', {
+            'theme_mode': isDarkMode ? 'light' : 'dark'
+        });
+    });
+}); 
